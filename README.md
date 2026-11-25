@@ -1,5 +1,8 @@
 # 桌宠素材包
-
+这是**手机端 DSH（DSH Go App）**的桌宠素材包，不是桌面版 Harness 插件。
+## 适用平台
+- 手机端 DSH Go（App 内「设置 › 宠物 › 导入 zip」）
+- 桌面版 DSH / Cordis 插件不适用
 给 DSH Go 用的桌宠素材包（图片帧 + pet.json）。
 
 ## 内容
