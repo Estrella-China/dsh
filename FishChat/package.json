@@ -1,7 +1,7 @@
 {
   "name": "fishchat",
   "productName": "FishChat",
-  "version": "0.5.9",
+  "version": "0.5.11",
   "description": "轻量 QQ 风格聊天客户端：与自定义机器人对话",
   "main": "main.js",
   "author": "FishChat",

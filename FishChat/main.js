@@ -35,6 +35,9 @@ let filesDir = '';
 let tray = null;
 let isQuitting = false;
 let trayHintShown = false;
+let splash = null;
+let mainReady = false;
+let splashDone = false;
 const isSmoke = process.argv.includes('--smoke');
 
 protocol.registerSchemesAsPrivileged([
@@ -49,6 +52,101 @@ function showWindow() {
   win.show();
   win.focus();
   if (win.isMinimized()) win.restore();
+}
+
+function maybeShowMainWindow() {
+  if (!win || win.isDestroyed()) return;
+  if (!mainReady || !splashDone) return;
+  win.show();
+  win.focus();
+}
+
+function createSplash() {
+  if (isSmoke) {
+    splashDone = true;
+    return;
+  }
+
+  splash = new BrowserWindow({
+    width: 440,
+    height: 300,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    movable: false,
+    minimizable: false,
+    maximizable: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    show: false,
+    focusable: false,
+    hasShadow: false,
+    backgroundColor: '#00000000',
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+
+  splash.loadFile(path.join(__dirname, 'renderer', 'splash.html'));
+  splash.once('ready-to-show', () => {
+    if (splash && !splash.isDestroyed()) splash.show();
+  });
+
+  const finish = () => {
+    if (!splash || splash.isDestroyed()) {
+      splashDone = true;
+      maybeShowMainWindow();
+      return;
+    }
+    let opacity = 1;
+    const timer = setInterval(() => {
+      if (!splash || splash.isDestroyed()) {
+        clearInterval(timer);
+        splashDone = true;
+        maybeShowMainWindow();
+        return;
+      }
+      opacity -= 0.12;
+      if (opacity <= 0) {
+        clearInterval(timer);
+        try {
+          splash.hide();
+          splash.destroy();
+        } catch (_) {}
+        splash = null;
+        splashDone = true;
+        maybeShowMainWindow();
+      } else {
+        try {
+          splash.setOpacity(opacity);
+        } catch (_) {}
+      }
+    }, 30);
+  };
+
+  // 入场动画约 1.5 秒，再淡出。
+  setTimeout(finish, 1600);
+
+  // 兜底：splash 加载失败或卡住时，不能让主窗口一直藏着。
+  setTimeout(() => {
+    if (splashDone) return;
+    try {
+      if (splash && !splash.isDestroyed()) splash.destroy();
+    } catch (_) {}
+    splash = null;
+    splashDone = true;
+    maybeShowMainWindow();
+  }, 5000);
+
+  splash.on('closed', () => {
+    splash = null;
+    if (!splashDone) {
+      splashDone = true;
+      maybeShowMainWindow();
+    }
+  });
 }
 
 function createTray() {
@@ -114,7 +212,10 @@ function createWindow() {
 
   Menu.setApplicationMenu(null);
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
-  win.once('ready-to-show', () => win.show());
+  win.once('ready-to-show', () => {
+    mainReady = true;
+    maybeShowMainWindow();
+  });
 
   // 关闭窗口：默认收进托盘继续后台运行（设置里可关掉）
   win.on('close', (e) => {
@@ -602,6 +703,7 @@ async function init() {
   });
 
   registerIpc();
+  createSplash();
   createWindow();
   if (store.data.meta.closeToTray !== false) createTray();
 
@@ -616,6 +718,12 @@ async function init() {
 
   app.on('before-quit', () => {
     isQuitting = true;
+    if (splash && !splash.isDestroyed()) {
+      try {
+        splash.destroy();
+      } catch (_) {}
+      splash = null;
+    }
     if (tray) {
       try {
         tray.destroy();
