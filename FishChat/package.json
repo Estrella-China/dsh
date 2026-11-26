@@ -1,0 +1,77 @@
+{
+  "name": "fishchat",
+  "productName": "FishChat",
+  "version": "0.5.9",
+  "description": "轻量 QQ 风格聊天客户端：与自定义机器人对话",
+  "main": "main.js",
+  "author": "FishChat",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "smoke": "electron . --smoke",
+    "test": "node test/protocol-test.js && node test/store-test.js",
+    "dist": "electron-builder --win nsis"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "electron": "^45.3.1",
+    "electron-builder": "^26.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "electron-winstaller"
+    ]
+  },
+  "build": {
+    "appId": "com.fishchat.app",
+    "productName": "FishChat",
+    "electronDist": "node_modules/electron/dist",
+    "compression": "normal",
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**",
+      "renderer/**",
+      "assets/**"
+    ],
+    "extraResources": [
+      {
+        "from": "bot",
+        "to": "bot"
+      },
+      {
+        "from": "bridge",
+        "to": "bridge"
+      },
+      {
+        "from": "node_modules/ws",
+        "to": "bridge/node_modules/ws"
+      }
+    ],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "FishChat"
+    }
+  }
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FishChat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <div class="sidebar-head">
+        <div class="brand">
+          <span class="brand-mark"><img src="icon.png" alt="FishChat" /></span>
+          <span class="brand-name">FishChat</span>
+        </div>
+        <div class="sidebar-head-actions">
+          <button id="btn-settings" class="icon-btn" title="设置">⚙️</button>
+          <button id="btn-theme" class="icon-btn" title="切换主题">🌙</button>
+        </div>
+      </div>
+
+      <div class="search-wrap">
+        <input id="search" type="text" placeholder="搜索" autocomplete="off" />
+      </div>
+
+      <div id="bot-list" class="bot-list"></div>
+
+      <div class="sidebar-foot">
+        <button id="btn-help" class="help-btn">＋ 如何接入我的机器人</button>
+      </div>
+    </aside>
+
+    <main id="main">
+      <header id="chat-head" class="chat-head">
+        <div class="chat-title">
+          <span id="chat-name">FishChat</span>
+          <span id="chat-status" class="status offline"></span>
+        </div>
+        <div class="chat-actions">
+          <span id="port-badge" class="port-badge" title="机器人连接端口"></span>
+          <button id="btn-rename" class="icon-btn" title="重命名">✏️</button>
+          <button id="btn-avatar" class="icon-btn" title="更换当前机器人头像">🎭</button>
+          <button id="btn-my-avatar" class="icon-btn" title="更换我的头像">👤</button>
+          <button id="btn-open-data" class="icon-btn" title="打开数据文件夹">📂</button>
+          <button id="btn-clear" class="icon-btn" title="清空当前聊天记录">🗑️</button>
+        </div>
+      </header>
+
+      <div id="messages" class="messages"></div>
+
+      <footer id="composer" class="composer disabled">
+        <div class="composer-toolbar">
+          <button class="icon-btn" data-panel="emoji" title="表情">😊</button>
+          <button class="icon-btn" data-panel="sticker" title="表情包">🎨</button>
+          <button id="btn-image" class="icon-btn" title="发送图片">🖼️</button>
+          <button id="btn-file" class="icon-btn" title="发送文件">📎</button>
+          <button id="btn-voice" class="icon-btn" title="录语音消息">🎤</button>
+          <span class="toolbar-spacer"></span>
+          <span id="typing" class="typing hidden">对方正在输入…</span>
+        </div>
+
+        <div id="recording-bar" class="recording-bar hidden">
+          <span class="rec-dot"></span>
+          <span id="rec-time">00:00</span>
+          <span class="rec-tip">录音中，点击麦克风停止并发送</span>
+          <button id="btn-rec-cancel" class="mini-btn">取消</button>
+        </div>
+
+        <div id="attachments" class="attachments hidden"></div>
+
+        <textarea id="input" placeholder="输入消息，Enter 发送，Shift + Enter 换行" rows="3"></textarea>
+
+        <div class="composer-foot">
+          <span class="hint">支持粘贴 / 拖拽图片和文件</span>
+          <button id="btn-send" class="send-btn" disabled>发送</button>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <div id="emoji-panel" class="panel hidden"></div>
+  <div id="sticker-panel" class="panel hidden"></div>
+  <div id="drop-mask" class="drop-mask hidden">松开鼠标即可发送文件</div>
+  <div id="help-modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>接入你自己的机器人</h2>
+        <button id="btn-help-close" class="icon-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>FishChat 会在这台电脑开一个机器人接入端口，你的机器人程序（Python / Node / 任意语言）连上来就能聊天。</p>
+        <ol>
+          <li>
+            <b>地址：</b><code id="help-address">ws://127.0.0.1:3210</code>
+            <button id="btn-copy-address" class="mini-btn">复制</button>
+          </li>
+          <li>机器人连上后 5 秒内发送 <code>{"type":"hello","name":"小Q"}</code></li>
+          <li>用户发消息时，机器人收到 <code>{"type":"message","text":"...","attachments":[...]}</code></li>
+          <li>机器人回复 <code>{"type":"reply","text":"...","attachments":[...]}</code></li>
+          <li>附件用 base64：<code>{"type":"image","name":"a.png","data":"&lt;base64&gt;"}</code></li>
+        </ol>
+        <p class="muted">示例机器人：<code>bot/bot_example.py</code>（安装 <code>pip install websockets</code> 后直接运行即可看到效果）。</p>
+      </div>
+    </div>
+  </div>
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-card settings-card">
+      <div class="modal-head">
+        <h2>设置</h2>
+        <button id="btn-settings-close" class="icon-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-row">
+          <div class="setting-text">
+            <div class="setting-title">消息通知</div>
+            <div class="setting-desc">窗口不在前台时，收到机器人消息弹出系统通知</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="set-notify" /><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-text">
+            <div class="setting-title">开机自启动</div>
+            <div class="setting-desc">登录 Windows 后自动打开 FishChat（桥也会跟着启动）</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="set-autostart" /><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-text">
+            <div class="setting-title">关闭窗口后继续在后台运行</div>
+            <div class="setting-desc">点 X 时收进托盘，桥不断开、消息照常接收；托盘图标里可以重新打开或退出</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="set-tray" /><span class="slider"></span></label>
+        </div>
+        <p class="muted" id="set-version-line">FishChat <span id="set-version"></span></p>
+      </div>
+    </div>
+  </div>
+  <div id="rename-modal" class="modal hidden">
+    <div class="modal-card rename-card">
+      <div class="modal-head">
+        <h2>重命名</h2>
+        <button id="btn-rename-close" class="icon-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <input id="rename-input" class="rename-input" maxlength="20" placeholder="输入新名字" />
+        <p class="muted">只改你这边显示的名字，机器人本身的 ID 不变（不影响聊天和记忆）</p>
+      </div>
+      <div class="modal-foot">
+        <button id="btn-rename-cancel" class="mini-btn">取消</button>
+        <button id="btn-rename-save" class="send-btn">保存</button>
+      </div>
+    </div>
+  </div>
+  <div id="toast" class="toast hidden"></div>
+  <input type="file" id="file-input" multiple hidden />
+  <input type="file" id="avatar-input" accept="image/*" hidden />
+  <script src="app.js"></script>
+</body>
+</html>
