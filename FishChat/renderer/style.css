@@ -1,20 +1,20 @@
 :root {
-  --bg: #f2f3f5;
-  --panel: #ffffff;
-  --panel-2: #f7f8fa;
-  --border: #e3e5e8;
+  --bg: #eaf6ff;
+  --panel: #f7fbff;
+  --panel-2: #e4f1ff;
+  --border: #cfe4f8;
   --text: #1f2329;
-  --text-2: #6b7280;
-  --text-3: #9aa0a6;
+  --text-2: #5f7185;
+  --text-3: #8fa3b8;
   --accent: #0091ff;
   --accent-2: #0077d9;
-  --accent-weak: #e8f3ff;
+  --accent-weak: #dceeff;
   --bubble-bot: #ffffff;
   --bubble-user: #0091ff;
   --bubble-user-text: #ffffff;
   --danger: #f04438;
   --radius: 12px;
-  --shadow: 0 8px 28px rgba(17, 24, 39, 0.08);
+  --shadow: 0 8px 28px rgba(17, 55, 90, 0.08);
 }
 
 [data-theme="dark"] {
@@ -854,7 +854,7 @@ body {
 .composer-foot {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding-top: 8px;
 }
 
@@ -1062,4 +1062,47 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   #app { animation: none; }
+}
+
+/* 聊天区纯白，左侧好友栏加深一点淡蓝 */
+#sidebar {
+  background: #d9edff;
+  border-right-color: #b9d8f2;
+}
+
+#main,
+.messages,
+.composer {
+  background: #ffffff;
+}
+
+/* 聊天区：淡点点阵 + 很浅的鱼形水印，保持朴素 */
+.messages {
+  background-color: #ffffff;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(0, 145, 255, 0.10) 1px, transparent 1.2px),
+    url("watermark.png");
+  background-repeat: repeat, no-repeat;
+  background-position: 0 0, right 26px bottom 10px;
+  background-size: 22px 22px, 260px 260px;
+  background-attachment: scroll, scroll;
+}
+
+/* 系统标题栏：深蓝底 + 白色窗口按钮 */
+#app {
+  padding-top: 40px;
+  box-sizing: border-box;
+}
+
+.sidebar-head,
+.chat-head {
+  -webkit-app-region: drag;
+}
+
+button,
+input,
+textarea,
+a,
+.bot-item {
+  -webkit-app-region: no-drag;
 }

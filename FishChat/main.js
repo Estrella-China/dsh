@@ -201,6 +201,16 @@ function createWindow() {
     title: 'FishChat',
     backgroundColor: '#f2f3f5',
     show: false,
+    ...(process.platform === 'win32'
+      ? {
+          titleBarStyle: 'hidden',
+          titleBarOverlay: {
+            color: '#0b2e4a',
+            symbolColor: '#ffffff',
+            height: 40,
+          },
+        }
+      : {}),
     icon: path.join(__dirname, 'assets', 'icon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),

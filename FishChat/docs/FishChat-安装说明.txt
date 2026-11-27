@@ -1,0 +1,91 @@
+FishChat 安装说明
+==================
+
+这份说明配合 FishChat-Setup-0.5.8.exe 使用。跟着做，10 分钟能聊上。
+
+
+一、你会拿到什么
+----------------
+1. FishChat-Setup-0.5.8.exe  —— 聊天软件安装包
+2. 本说明
+
+
+二、安装 FishChat（5 分钟）
+---------------------------
+1. 双击 FishChat-Setup-0.5.8.exe
+2. 如果 Windows 弹出"未知发布者/已保护你的电脑"，点【更多信息】→【仍要运行】
+3. 一路【下一步】安装（默认即可）
+4. 安装完，桌面会出现 FishChat 图标，先不用打开
+
+
+三、安装 DeepSeek Harness（DSH）
+--------------------------------
+1. 打开 https://www.deepseek.com/harness 下载桌面版
+2. 安装并登录你的 DeepSeek 账号（Aurabot 跑在 DSH 里，用它账号的额度）
+
+
+四、安装 Aurabot 插件（关键一步）
+---------------------------------
+方式一：在 DSH 插件面板里找
+  - 打开 DSH → 侧栏「插件」/「插件管理」
+  - 搜索 Aurabot（或 dsh-aurabot-qq），点安装
+
+方式二：命令行安装（插件面板找不到时用这个）
+  1. 先装 Git（https://git-scm.com/download/win，一路下一步）
+  2. 在 DSH 里打开终端（或开始菜单搜 PowerShell），执行：
+
+     dsh plugin --profile desktop add github:accomplish07zrh-eng/dsh-aurabot-qq
+
+     如果提示找不到 dsh，用完整路径：
+
+     & "$env:LOCALAPPDATA\Programs\DeepSeek Harness\resources\runtime\cli\bin\dsh.cmd" plugin --profile desktop add github:accomplish07zrh-eng/dsh-aurabot-qq
+
+  3. 装完重启 DSH，侧栏「自动化任务」下面会出现 Aurabot
+
+
+五、配置 Aurabot（重点）
+------------------------
+打开 Aurabot 面板，按下面填：
+
+  【连接】页
+    网关：选「OneBot」/「已有 OneBot」
+    地址：http://127.0.0.1:5800
+    WebSocket：ws://127.0.0.1:5800
+    机器人 QQ：38890000
+    主人 QQ：38890001
+
+    （这两个 QQ 号是固定值，不用改，必须和 FishChat 里的桥一致）
+
+  【模型】页：选一个模型（默认跟随 DSH 设置）
+
+  【权限/开关】：
+    - 关掉「试运行」
+    - 打开「总开关」
+
+  【人格】页：默认就是「大肥鱼」，不用动
+
+
+六、打开 FishChat 测试
+----------------------
+1. 双击桌面 FishChat
+2. 等几秒，左侧出现「大肥鱼」，显示【在线】
+3. 发一条消息，能收到回复就说明全部配置成功
+
+
+七、常见问题
+------------
+Q：显示「离线」怎么办？
+A：说明 Aurabot 没连上桥。检查 Aurabot「连接」页地址是不是 127.0.0.1:5800，
+   以及 DSH 是否开着。
+
+Q：发消息没回复？
+A：Aurabot 里确认「试运行」已关闭、「总开关」已打开，模型已选好。
+
+Q：提示端口被占用 / 桥没启动？
+A：关掉所有 FishChat 窗口重新打开；还是不行重启电脑。
+
+Q：需要装 Node.js 吗？
+A：不需要。FishChat 自带桥需要的运行环境。
+
+Q：FishChat 和 Aurabot 的数据在哪？
+A：各自独立，聊天记录在 FishChat 里，人格/记忆在 Aurabot（DSH）里，互不影响。
